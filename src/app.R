@@ -100,17 +100,22 @@ ui <- tagList(
           align-items: center !important; 
           justify-content: flex-start !important; 
           gap: 8px !important;
-      }
+          width: 100% !important;
+          margin-left: 0 !important;
       }
       .dataTables_wrapper .dataTables_filter label {
-        color: white !important; 
-        font-size: 14px !important;  /* Makes text smaller */
+        color: white !important;
+        font-size: 14px !important;
       }
       .dataTables_wrapper .dataTables_filter input {
         background-color: #333 !important;
         color: white !important;
         border: 1px solid #555 !important;
-        font-size: 12px !important; /* Makes input box text smaller */
+        font-size: 12px !important;
+      }
+      .dataTables_wrapper .dataTables_length label {
+        color: white !important;
+        font-size: 14px !important;
       }
       .dataTables_wrapper .dataTables_length select {
         background-color: #333 !important;
@@ -187,37 +192,37 @@ server <- function(input, output, session) {
   # Render Data Tables with Formatting
   output$equities_table <- renderDT({
     datatable(equities_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
   
   output$etfs_table <- renderDT({
     datatable(etfs_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
   
   output$crypto_table <- renderDT({
     datatable(crypto_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
   
   output$bonds_table <- renderDT({
     datatable(bonds_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
   
   output$futures_table <- renderDT({
     datatable(futures_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
   
   output$forex_table <- renderDT({
     datatable(forex_df, 
-              options = list(pageLength = 10, dom = "ftip"),
+              options = list(pageLength = 10, dom = "lftip"),
               rownames = FALSE)
   })
 }
