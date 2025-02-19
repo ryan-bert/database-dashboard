@@ -78,7 +78,6 @@ ui <- tagList(
       table.dataTable {
         background-color: #222 !important;
         color: white !important;
-        width: 75% !important;
         margin-left: 0 !important;
       }
       thead {
@@ -119,6 +118,22 @@ ui <- tagList(
       }
       .dataTables_wrapper .dataTables_length select {
         background-color: #333 !important;
+        color: white !important;
+      }
+      .dataTables_wrapper .dataTables_paginate {
+        margin-top: 1rem !important;
+        color: white !important;
+      }
+      .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.3em 0.8em !important;
+        border: 1px solid #555 !important;
+        background: #333 !important;
+        color: white !important;
+      }
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #555 !important;
+      }
+      .dataTables_wrapper .dataTables_info {
         color: white !important;
       }
     ")),
