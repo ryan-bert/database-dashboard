@@ -1,21 +1,129 @@
 library(shiny)
+library(DBI)
+library(RPostgres)
+library(jsonlite)
+library(dplyr)
+library(DT)  # Interactive tables
+
+# Load PostgreSQL credentials
+credentials_path <- file.path("~/Documents/Credentials/Raspberry Pi/financial-database.json")
+credentials <- fromJSON(credentials_path)
+
+# Connect to the database
+conn <- dbConnect(
+  Postgres(),
+  dbname = credentials$dbname,
+  host = credentials$host,
+  port = as.integer(credentials$port),
+  user = credentials$user,
+  password = credentials$password
+)
+
+# Load stock data
+equities_df <- dbGetQuery(conn, "SELECT * FROM equities") %>%
+  mutate(
+    Price = round(Price, 2),
+    Return = round(Return, 6),
+    Date = as.Date(Date)
+  )
+
+# Load ETF data
+etfs_df <- dbGetQuery(conn, "SELECT * FROM etfs") %>%
+  mutate(
+    Price = round(Price, 2),
+    Return = round(Return, 6),
+    Date = as.Date(Date)
+  )
+
+# Load crypto data
+crypto_df <- dbGetQuery(conn, "SELECT * FROM crypto") %>%
+  mutate(
+    Price = round(Price, 2),
+    Return = round(Return, 6),
+    Date = as.Date(Date)
+  )
+
+# Load bond data
+bonds_df <- dbGetQuery(conn, "SELECT * FROM bonds") %>%
+  mutate(
+    Yield = round(Yield, 2),
+    Date = as.Date(Date)
+  )
+
+# Load futures data
+futures_df <- dbGetQuery(conn, "SELECT * FROM futures") %>%
+  mutate(
+    Price = round(Price, 2),
+    Return = round(Return, 6),
+    Date = as.Date(Date)
+  )
+
+# Load forex data
+forex_df <- dbGetQuery(conn, "SELECT * FROM forex") %>%
+  mutate(
+    Price = round(Price, 2),
+    Return = round(Return, 6),
+    Date = as.Date(Date)
+  )
 
 # Define custom classes
 my_underline <- "relative after:absolute after:left-0 after:right-0 after:bottom-[-4px] after:h-[3px] after:bg-white after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-500"
 
 ui <- tagList(
-  # Include Tailwind CSS
   tags$head(
     tags$script(src = "https://cdn.tailwindcss.com"),
     
-    # Automatically set the initial page to "equities"
+    # Custom Styling
+    tags$style(HTML("
+      table.dataTable {
+        background-color: #222 !important;
+        color: white !important;
+        width: 75% !important;
+        margin-left: 0 !important;
+      }
+      thead {
+        background-color: #333 !important;
+        color: #fff !important;
+      }
+      tbody tr {
+        background-color: #222 !important;
+      }
+      tbody tr:hover {
+        background-color: #444 !important;
+      }
+      .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: white !important;
+      }
+      .dataTables_wrapper .dataTables_filter {
+          text-align: left !important; 
+          display: flex !important; 
+          align-items: center !important; 
+          justify-content: flex-start !important; 
+          gap: 8px !important;
+      }
+      }
+      .dataTables_wrapper .dataTables_filter label {
+        color: white !important; 
+        font-size: 14px !important;  /* Makes text smaller */
+      }
+      .dataTables_wrapper .dataTables_filter input {
+        background-color: #333 !important;
+        color: white !important;
+        border: 1px solid #555 !important;
+        font-size: 12px !important; /* Makes input box text smaller */
+      }
+      .dataTables_wrapper .dataTables_length select {
+        background-color: #333 !important;
+        color: white !important;
+      }
+    ")),
+    
     tags$script(HTML("Shiny.setInputValue('page', 'equities', {priority: 'event'});"))
   ),
+
   
-  # Main Container
+  
   tags$div(class = "bg-black text-white min-h-screen",
-    
-    # Navbar
     tags$div(class = "text-lg flex justify-center py-2 w-full",
       tags$div(class = "space-x-6",
         tags$a(href = "#", class = my_underline, "Equities", onclick = "Shiny.setInputValue('page', 'equities', {priority: 'event'})"),
@@ -27,74 +135,90 @@ ui <- tagList(
       )
     ),
     
-    # Dynamic page content
-    tags$div(class = "p-8",
-      uiOutput("page_content")
-    )
+    tags$div(class = "p-8 flex justify-start", uiOutput("page_content")) # Centering the tables
   )
 )
 
 server <- function(input, output, session) {
   
-  # Ensure page starts on "equities" if not set
   observe({
     if (is.null(input$page)) {
       updateQueryString("?page=equities", mode = "replace", session)
     }
   })
   
-  # Reactive Page Content
+  # Render the correct table based on the selected page
   output$page_content <- renderUI({
-    # Set default page to "equities"
     page <- input$page %||% "equities"
-
-######################### EQUIITIES PAGE #########################
-
+    
     if (page == "equities") {
       tagList(
-        h1("Equities Page", class = "text-3xl")
+        h1("Equities Page", class = "text-3xl"),
+        DTOutput("equities_table")
       )
-
-######################### ETFs PAGE #########################
-
     } else if (page == "etfs") {
       tagList(
-        h2("ETFs Page", class = "text-2xl font-bold"),
-        p("Welcome to the ETFs section.", class = "text-lg")
+        h1("ETFs Page", class = "text-3xl"),
+        DTOutput("etfs_table")
       )
-
-######################### CRYPTO PAGE #########################
-
     } else if (page == "crypto") {
       tagList(
-        h2("Crypto Page", class = "text-2xl font-bold"),
-        p("Welcome to the Crypto section.", class = "text-lg")
+        h1("Crypto Page", class = "text-3xl"),
+        DTOutput("crypto_table")
       )
-
-######################### BONDS PAGE #########################
-
     } else if (page == "bonds") {
       tagList(
-        h2("Bonds Page", class = "text-2xl font-bold"),
-        p("Welcome to the Bonds section.", class = "text-lg")
+        h1("Bonds Page", class = "text-3xl"),
+        DTOutput("bonds_table")
       )
-
-######################### FUTURES PAGE #########################
-
     } else if (page == "futures") {
       tagList(
-        h2("Futures Page", class = "text-2xl font-bold"),
-        p("Welcome to the Futures section.", class = "text-lg")
+        h1("Futures Page", class = "text-3xl"),
+        DTOutput("futures_table")
       )
-
-######################### FOREX PAGE #########################
-
     } else if (page == "forex") {
       tagList(
-        h2("Forex Page", class = "text-2xl font-bold"),
-        p("Welcome to the Forex section.", class = "text-lg")
+        h1("Forex Page", class = "text-3xl"),
+        DTOutput("forex_table")
       )
     }
+  })
+
+  # Render Data Tables with Formatting
+  output$equities_table <- renderDT({
+    datatable(equities_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
+  })
+  
+  output$etfs_table <- renderDT({
+    datatable(etfs_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
+  })
+  
+  output$crypto_table <- renderDT({
+    datatable(crypto_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
+  })
+  
+  output$bonds_table <- renderDT({
+    datatable(bonds_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
+  })
+  
+  output$futures_table <- renderDT({
+    datatable(futures_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
+  })
+  
+  output$forex_table <- renderDT({
+    datatable(forex_df, 
+              options = list(pageLength = 10, dom = "ftip"),
+              rownames = FALSE)
   })
 }
 
