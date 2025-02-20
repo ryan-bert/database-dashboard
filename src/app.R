@@ -206,39 +206,27 @@ server <- function(input, output, session) {
 
   # Render Data Tables with Formatting
   output$equities_table <- renderDT({
-    datatable(equities_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(equities_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
   
   output$etfs_table <- renderDT({
-    datatable(etfs_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(etfs_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
   
   output$crypto_table <- renderDT({
-    datatable(crypto_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(crypto_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
   
   output$bonds_table <- renderDT({
-    datatable(bonds_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(bonds_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
   
   output$futures_table <- renderDT({
-    datatable(futures_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(futures_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
   
   output$forex_table <- renderDT({
-    datatable(forex_df, 
-              options = list(pageLength = 10, dom = "lftip"),
-              rownames = FALSE)
+    datatable(forex_df, options = list(pageLength = 50, dom = "lftip"), rownames = FALSE)
   })
 }
 
